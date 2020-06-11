@@ -187,4 +187,8 @@ dmypy.json
 *.npy
 
 # Keras models
-*.h5 
+*.h5
+
+# VSC settings
+.vscode/
+.vscode/settings.json

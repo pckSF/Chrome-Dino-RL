@@ -21,6 +21,11 @@ def make_dqn(actions, input_dimensions):
     model.add(layers.Flatten())
 
     model.add(layers.Dense(512, activation='relu'))
+    model.add(layers.Dropout(0.3))
+    model.add(layers.Dense(256, activation='relu'))
+    model.add(layers.Dropout(0.2))
+    model.add(layers.Dense(256, activation='relu'))
+    model.add(layers.Dropout(0.1))
     model.add(layers.BatchNormalization())
     model.add(layers.Dense(actions, activation='linear'))
     

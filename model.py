@@ -11,7 +11,7 @@ from interface import Interface
 
 
 BATCHSIZE = 50
-ITERATIONS = 4000
+ITERATIONS = 2100
 MAX_MEMORY = 10000
 GAMMA = 0.95
 INIT_EPSILON = 1
@@ -19,10 +19,25 @@ MIN_EPSILON = 0.0001
 
 
 memory = []
-DQN_1 = make_dqn(2, (4, 50, 100))
-DQN_2 = make_dqn(2, (4, 50, 100))
-DQN_1.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07), loss='mse')
-DQN_2.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07), loss='mse')
+DQN_p = make_dqn(2, (4, 50, 100))
+DQN_t = make_dqn(2, (4, 50, 100))
+DQN_p.compile(
+    optimizer=tf.keras.optimizers.Adam(
+        learning_rate=0.0001, 
+        beta_1=0.9, beta_2=0.999, 
+        epsilon=1e-07
+        ), 
+    loss='mse'
+    )
+DQN_t.compile(
+    optimizer=tf.keras.optimizers.Adam(
+        learning_rate=0.0001, 
+        beta_1=0.9, 
+        beta_2=0.999, 
+        epsilon=1e-07
+        ), 
+    loss='mse'
+    )
 interface = Interface()
 time.sleep(1)
 
@@ -78,8 +93,9 @@ def update(pred_dqn, target_dqn, batch):
         if terminal:
             targets[i, action_t] = -100
         else:
-            q_values_t1 = target_dqn.predict(state_t1[np.newaxis, :])
-            targets[i, action_t] = 1 + GAMMA * np.max(q_values_t1)
+            action_t1 = np.argmax(pred_dqn.predict(state_t1[np.newaxis, :]))
+            q_values_t1 = target_dqn.predict(state_t1[np.newaxis, :])[0]
+            targets[i, action_t] = 1 + GAMMA * q_values_t1[action_t1]
     return pred_dqn.train_on_batch(states, targets)
 
 
@@ -90,19 +106,19 @@ epsilon = INIT_EPSILON
 
 for i in range(ITERATIONS):
     print("Episode " +  str(i))
-    play_episode(interface, DQN_1, memory, epsilon)
+    play_episode(interface, DQN_p, memory, epsilon)
     score_history.append(interface.get_score())
     epsilon = np.max([MIN_EPSILON, epsilon - epsilon / 100])
     print("Epsilon:", epsilon)
-    if len(memory) < 500:
+    if len(memory) < 150:
         continue
     batch = random.sample(memory, BATCHSIZE)
-    loss = update(DQN_1, DQN_2, batch)
+    loss = update(DQN_p, DQN_t, batch)
     print("Loss:", loss)
     loss_history.append(loss)
     if (i + 1) % 5 == 0:
         print('Update Target NN')
-        DQN_2.set_weights(DQN_1.get_weights())
+        DQN_t.set_weights(DQN_p.get_weights())
     avg = np.sum(score_history[-10:]) / 10
     print("Rolling 10-Runs average:", avg)
     if i % 500 == 0:
@@ -110,13 +126,4 @@ for i in range(ITERATIONS):
         time.sleep(5)
         interface = Interface()
         time.sleep(5)
-
-# model.save('model_checkpoint') 
-
-
-
-
-
-
-
     
