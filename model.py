@@ -19,8 +19,8 @@ MIN_EPSILON = 0.0001
 
 
 memory = []
-DQN_p = make_dqn(2, (4, 50, 100))
-DQN_t = make_dqn(2, (4, 50, 100))
+DQN_p = make_ddqn()
+DQN_t = make_ddqn()
 DQN_p.compile(
     optimizer=tf.keras.optimizers.Adam(
         learning_rate=0.0001, 
@@ -61,7 +61,7 @@ def step(interface, pred_dqn, memory, state_t, score_t, epsilon):
     else:
         action_t = np.argmax(q_values)
     state, score_t1, terminal = interface.action(action_t)
-    state_t1 = np.append(state_t, state, axis=0)[1:]
+    state_t1 = np.append(state, state_t[1:], axis=0)
     reward_t = score_t1 - score_t
     add_step(memory, state_t, action_t, reward_t, q_values, state_t1, terminal)
     return state_t1, score_t1, terminal
@@ -69,7 +69,7 @@ def step(interface, pred_dqn, memory, state_t, score_t, epsilon):
 def play_episode(interface, pred_dqn, memory, epsilon):
     """ Restart and play through one dino run until the dino crashes"""
     state_t = np.zeros((4, 50, 100))
-    state_t = np.append(state_t, interface.re_start(), axis=0)[1:]
+    state_t[0] = interface.re_start()
     score_t = 0
     time.sleep(1)
     while True:
