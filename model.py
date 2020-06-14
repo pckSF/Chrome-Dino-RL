@@ -10,20 +10,20 @@ from dqn import make_dqn
 from interface import Interface
 
 
-BATCHSIZE = 50
-ITERATIONS = 2100
-MAX_MEMORY = 10000
+BATCHSIZE = 64
+ITERATIONS = 2500
+MAX_MEMORY = 1000
 GAMMA = 0.95
 INIT_EPSILON = 1
-MIN_EPSILON = 0.0001
+MIN_EPSILON = 0.01
 
 
 memory = []
-DQN_p = make_ddqn()
-DQN_t = make_ddqn()
+DQN_p = make_dqn(2, (4, 50, 100))
+DQN_t = make_dqn(2, (4, 50, 100))
 DQN_p.compile(
     optimizer=tf.keras.optimizers.Adam(
-        learning_rate=0.0001, 
+        learning_rate=0.00005, 
         beta_1=0.9, beta_2=0.999, 
         epsilon=1e-07
         ), 
@@ -110,13 +110,13 @@ for i in range(ITERATIONS):
     score_history.append(interface.get_score())
     epsilon = np.max([MIN_EPSILON, epsilon - epsilon / 100])
     print("Epsilon:", epsilon)
-    if len(memory) < 150:
+    if len(memory) < 100:
         continue
     batch = random.sample(memory, BATCHSIZE)
     loss = update(DQN_p, DQN_t, batch)
     print("Loss:", loss)
     loss_history.append(loss)
-    if (i + 1) % 5 == 0:
+    if (i + 1) % 10 == 0:
         print('Update Target NN')
         DQN_t.set_weights(DQN_p.get_weights())
     avg = np.sum(score_history[-10:]) / 10
