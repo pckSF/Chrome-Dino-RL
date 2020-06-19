@@ -20,7 +20,7 @@ MIN_EPSILON = 0.01
 
 memory = []
 DQN_p = make_dqn(2, (4, 50, 100))
-DQN_t = make_dqn(2, (4, 50, 100))
+DQN_t = tf.keras.models.clone_model(DQN_p)
 DQN_p.compile(
     optimizer=tf.keras.optimizers.Adam(
         learning_rate=0.00005, 
@@ -29,15 +29,7 @@ DQN_p.compile(
         ), 
     loss='mse'
     )
-DQN_t.compile(
-    optimizer=tf.keras.optimizers.Adam(
-        learning_rate=0.0001, 
-        beta_1=0.9, 
-        beta_2=0.999, 
-        epsilon=1e-07
-        ), 
-    loss='mse'
-    )
+DQN_t.set_weights(DQN_p.get_weights())
 interface = Interface()
 time.sleep(1)
 
