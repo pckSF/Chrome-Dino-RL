@@ -163,7 +163,7 @@ class DinoAgent:
         self,
         episodes: int,
         continue_training: bool = True,
-        update_frequency: int = 10,
+        update_frequency: int = 5,
     ) -> None:
         """Trains the model for epsiodes"""
         if not continue_training:
