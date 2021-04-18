@@ -12,11 +12,25 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 class Interface:
+    """Interface for interaction between the agent and the chrome dino game.
+
+    An interface that uses a selenium webdriver to start a chrome instance in
+    which the chrome-dino game is run. Provides methods that enable interaction
+    between the agent and the game.
+
+    Attributes:
+        driver: The selenium chrome instance
+        runner: A link to the game in the driver instance
+        get_canvas_js: A string containing a javascript to extract the image from
+            the div class="runner-canvas"
+    """
+
     def __init__(self):
-        """
-        Use chrome and fetch the latest webdriver
-        Load the local chrome://dino game
-        Read the get_canvas.js script into a class variable
+        """Initialises the chrome interface.
+
+        - Uses chrome and fetch the latest webdriver
+        - Loads the local chrome://dino game
+        - Reads the get_canvas.js script into a class variable
         """
         self.chrome_options = webdriver.ChromeOptions()
         self.chrome_options.add_argument("--mute-audio")
@@ -34,13 +48,13 @@ class Interface:
         self.get_canvas_js = open("scs/get_canvas.js").read()
 
     def re_start(self) -> np.ndarray:
-        """Simulate a SPACE keypress to start or restart the game"""
+        """Simulates a SPACE keypress to start or restart the game"""
         self.action(3)
         return self.get_canvas()
 
     def get_score(self) -> int:
         """
-        Get and return the current score by accessing its variables with javascript
+        Gets and return sthe current score by accessing its variables with javascript
         """
         score_array = self.driver.execute_script(
             "return Runner.instance_.distanceMeter.digits"
@@ -48,18 +62,18 @@ class Interface:
         return int("".join(score_array))
 
     def check_crashed(self) -> bool:
-        """Get and return the playing and crashed gamestates"""
+        """Gets and returns the playing and crashed gamestates"""
         # playing = self.driver.execute_script("return Runner.instance_.playing")
         crashed = self.driver.execute_script("return Runner.instance_.crashed")
         return crashed
 
     def action(self, action: int) -> Tuple[np.ndarray, int, bool]:
         """
-        Perform the possible actions:
-        0 = do nothing / run straight:
-        1 = simulate ARROW_UP keypress = jump
-        2 = simulate ARROW_DOwn keypress = crouch
-        else = simulate SPACE keypress = jump
+        Performs one of the possible actions:
+            0 = do nothing / run straight:
+            1 = simulate ARROW_UP keypress = jump
+            2 = simulate ARROW_DOwn keypress = crouch
+            else = simulate SPACE keypress = jump
 
         Args:
             action: An integer representing one of three actions
@@ -84,7 +98,9 @@ class Interface:
     def get_canvas(self) -> np.ndarray:
         """
         Extracts the canvas by executing get_canvas.js
-        Decodes canvas into a numpy array and returns the reduced image
+        Decodes canvas into a numpy array and returns the reduced image.
+        Applies preprocessing in form of of cutting pixel values above and below
+        given threshold to clean the image of background noise.
         """
         base64_canvas = self.driver.execute_script(self.get_canvas_js)
         decoded_canvas = base64.b64decode(base64_canvas)
@@ -96,5 +112,5 @@ class Interface:
         return rescaled_image[np.newaxis, :]
 
     def close(self) -> None:
-        """Close the active chrome session"""
+        """Closes the active chrome session"""
         self.driver.close()

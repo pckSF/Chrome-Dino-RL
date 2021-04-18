@@ -34,10 +34,11 @@ class ReplayMemory:
     from the buffer.
 
     Attributes:
-        _capacity:
-        _capacity_reached:
-        _batchsize:
-        _buffer:
+        _capacity: Maximum number of timesteps to be stored in the memory
+        _capacity_reached: Flag that indicates if the memory is filled and the
+            and becomes a rolling window of the last _capacity timesteps
+        _batchsize: Number of timesteps returned in a sampe batch
+        _buffer: The list that stores the timestep data.
     """
 
     def __init__(self, capacity: int, batchsize: int):
@@ -49,7 +50,12 @@ class ReplayMemory:
         self._buffer: List[Timestep] = []
 
     def add_timestep(self, timestep_buffer: Timestep) -> None:
-        """Adds a single timestep to the memory"""
+        """
+        Adds a single timestep to the memory and sets the _batch_possible as well
+        as the _capacitzy_reached flags if conditions are met.
+        Keeps rolling window of the last _capacity number of timeslots once
+        _caüacity is reached.
+        """
         self._buffer.append(timestep_buffer)
         if not self.batch_possible:
             if len(self._buffer) >= self._batchsize:
