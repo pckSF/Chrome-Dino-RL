@@ -25,7 +25,7 @@ class Interface:
             the div class="runner-canvas"
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialises the chrome interface.
 
         - Uses chrome and fetch the latest webdriver

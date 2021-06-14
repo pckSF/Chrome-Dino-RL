@@ -55,7 +55,7 @@ class DinoAgent:
         gamma: float = 0.85,
         init_epsilon: float = 1.0,
         min_epsilon: float = 0.01,
-    ):
+    ) -> None:
         """Initialises DinoAgent class with arguments.
 
         Initialises the agent by compiling the neural networks, and creating
