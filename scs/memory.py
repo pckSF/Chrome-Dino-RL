@@ -41,37 +41,40 @@ class ReplayMemory:
         _buffer: The list that stores the timestep data.
     """
 
-    def __init__(self, capacity: int, batchsize: int):
+    def __init__(self, capacity: int, batchsize: int) -> None:
         """Initialises the empty experience replay memory with args"""
         self._capacity: int = capacity
         self._capacity_reached: bool = False
         self._batchsize: int = batchsize
         self.batch_possible: bool = False
-        self._buffer: List[Timestep] = []
+        self._buffer: List[Timestep] = [None for _ in range(capacity)]
+        self._data_index: int = 0
 
     def add_timestep(self, timestep_buffer: Timestep) -> None:
         """
-        Adds a single timestep to the memory and sets the _batch_possible as well
+        Adds a single timestep to the memory and sets the batch_possible as well
         as the _capacitzy_reached flags if conditions are met.
         Keeps rolling window of the last _capacity number of timeslots once
-        _caüacity is reached.
+        _capacity is reached.
         """
-        self._buffer.append(timestep_buffer)
+        self._buffer[self._data_index] = timestep_buffer
         if not self.batch_possible:
-            if len(self._buffer) >= self._batchsize:
+            if self._data_index >= self._batchsize:
                 self.batch_possible = True
-        if not self._capacity_reached:
-            if len(self._buffer) >= self._capacity:
-                self._capacity_reached = True
-        else:
-            del self._buffer[0]
+        if self._data_index >= self._capacity:
+            self._capacity_reached = True
+            self._capacity = 0
 
     def sample_batch(self) -> Tuple[int, List[Timestep]]:
         """Returns a random uniform sampled batch of batchsize"""
-        return self._batchsize, random.sample(self._buffer, self._batchsize)
+        if not self._capacity_reached:
+            batch = random.sample(self._buffer[: self._data_index], self._batchsize)
+        else:
+            batch = random.sample(self._buffer, self._batchsize)
+        return self._batchsize, batch
 
     def reset(self) -> None:
         """Resets the replay memory"""
-        self._buffer.clear()
+        self._buffer: List[Timestep] = [None for _ in range(self._capacity)]
         self._capacity_reached = False
         self.batch_possible = False
