@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from dataclasses import dataclass
 from typing import List, Tuple
@@ -18,12 +20,12 @@ class Timestep:
         terminal: Timestep ends in terminal state
     """
 
-    state: np.ndarray
-    action: int
-    reward: int
-    q_values: np.ndarray
-    next_state: np.ndarray
-    terminal: bool
+    state: None | np.ndarray = None
+    action: None | int = None
+    reward: None | int = None
+    q_values: None | np.ndarray = None
+    next_state: None | np.ndarray = None
+    terminal: None | bool = None
 
 
 class ReplayMemory:
@@ -47,7 +49,7 @@ class ReplayMemory:
         self._capacity_reached: bool = False
         self._batchsize: int = batchsize
         self.batch_possible: bool = False
-        self._buffer: List[Timestep] = [None for _ in range(capacity)]
+        self._buffer: List[Timestep] = [Timestep() for _ in range(capacity)]
         self._data_index: int = 0
 
     def add_timestep(self, timestep_buffer: Timestep) -> None:
@@ -75,6 +77,6 @@ class ReplayMemory:
 
     def reset(self) -> None:
         """Resets the replay memory"""
-        self._buffer: List[Timestep] = [None for _ in range(self._capacity)]
+        self._data_index = 0
         self._capacity_reached = False
         self.batch_possible = False
