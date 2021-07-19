@@ -205,6 +205,7 @@ class DinoAgent:
         while not terminal:
             terminal = self._step()
         self.score_history.append(self._interface.get_score())
+        time.sleep(1.5)
 
     def train(
         self,

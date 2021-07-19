@@ -52,14 +52,15 @@ class ReplayMemory:
         self._buffer: List[Timestep] = [Timestep() for _ in range(capacity)]
         self._data_index: int = 0
 
-    def add_timestep(self, timestep_buffer: Timestep) -> None:
+    def add_timestep(self, timestep: Timestep) -> None:
         """
         Adds a single timestep to the memory and sets the batch_possible as well
         as the _capacitzy_reached flags if conditions are met.
         Keeps rolling window of the last _capacity number of timeslots once
         _capacity is reached.
         """
-        self._buffer[self._data_index] = timestep_buffer
+        self._buffer[self._data_index] = timestep
+        self._data_index += 1
         if not self.batch_possible:
             if self._data_index >= self._batchsize:
                 self.batch_possible = True
