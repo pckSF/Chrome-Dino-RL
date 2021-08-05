@@ -111,10 +111,10 @@ class DinoAgent:
             )
 
     def _restart_interface(self) -> None:
-        """Restarts the interface which.
+        """Restarts the interface which helps with stability.
 
-        Restarting the interface from time to time is recommended to avoid
-        potential crashes of the webdriver during long training processes.
+        Restarting the interface from time to time is recommended to avoid potential
+        crashes of the webdriver during long training processes.
         """
         self._interface.close()
         time.sleep(5)
@@ -158,10 +158,10 @@ class DinoAgent:
         """
         if self._memory.batch_possible:
             self._qnn_t.set_weights(self._qnn_p.get_weights())
-            print(f"{datetime.now()}: Updated target qnn")
+            self._print_terminal("Updated target qnn")
 
     def _step(self) -> bool:
-        """Performs one step in the environment
+        """Performs one step in the environment.
 
         Performs one action (epsilon-greedy) and adds the timestep
         data to the experience replay memory. In case the step is exploratory,
@@ -205,7 +205,6 @@ class DinoAgent:
         while not terminal:
             terminal = self._step()
         self.score_history.append(self._interface.get_score())
-        time.sleep(1.5)
 
     def train(
         self,
@@ -237,20 +236,18 @@ class DinoAgent:
             loss = self._update()
             self._update_epsilon()
             self.loss_history.append(loss)
-            print(
-                f"{datetime.now()}: "
+            self._print_terminal(
                 f"Episode {e + 1} of {episodes} completed with with score: "
                 f"{self.score_history[-1]}; Updated epsilon to: {self._epsilon}"
             )
             if (e + 1) % update_frequency == 0:
                 self._update_target_qnn()
                 mean = np.mean(self.score_history[-update_frequency:])
-                print(
-                    f"{datetime.now()}: "
+                self._print_terminal(
                     f"Rolling {update_frequency}-episodes mean score: {mean}"
                 )
             if (e + 1) % 500 == 0:
-                print(f"{datetime.now().time()}: Restarting interface")
+                self._print_terminal("Restarting interface")
                 self._restart_interface()
 
     def print_performance(self) -> None:
@@ -267,3 +264,7 @@ class DinoAgent:
         ax_loss.set_ylabel("Loss")
         ax_loss.set_xlabel("Episode")
         plt.show()
+
+    def _print_terminal(self, message: str) -> str:
+        """Prints a timestamped message to the terminal"""
+        print(f"{datetime.now()}: {message}")
