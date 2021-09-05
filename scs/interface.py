@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import base64
 import io
 import time
-from typing import Tuple
 
 import cv2
 import numpy as np
@@ -67,7 +68,7 @@ class Interface:
         crashed = self.driver.execute_script("return Runner.instance_.crashed")
         return crashed
 
-    def action(self, action: int) -> Tuple[np.ndarray, int, bool]:
+    def action(self, action: int) -> tuple[np.ndarray, int, bool]:
         """
         Performs one of the possible actions:
             0 = do nothing / run straight:

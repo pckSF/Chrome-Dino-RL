@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import random
 import time
 from datetime import datetime
-from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -82,8 +83,8 @@ class DinoAgent:
         self._qnn_t: tf.keras.Sequential = tf.keras.models.clone_model(self._qnn_p)
         self._initialize_qnns()
         self._interface: Interface = Interface()
-        self.score_history: List[int] = []
-        self.loss_history: List[float] = []
+        self.score_history: list[int] = []
+        self.loss_history: list[float] = []
         time.sleep(1)
 
     def _initialize_qnns(self) -> None:

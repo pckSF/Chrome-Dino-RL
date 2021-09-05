@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-from typing import List, Tuple
 
 import numpy as np
 
@@ -49,7 +48,7 @@ class ReplayMemory:
         self._capacity_reached: bool = False
         self._batchsize: int = batchsize
         self.batch_possible: bool = False
-        self._buffer: List[Timestep] = [Timestep() for _ in range(capacity)]
+        self._buffer: list[Timestep] = [Timestep() for _ in range(capacity)]
         self._data_index: int = 0
 
     def add_timestep(self, timestep: Timestep) -> None:
@@ -68,7 +67,7 @@ class ReplayMemory:
             self._capacity_reached = True
             self._capacity = 0
 
-    def sample_batch(self) -> Tuple[int, List[Timestep]]:
+    def sample_batch(self) -> tuple[int, list[Timestep]]:
         """Returns a random uniform sampled batch of batchsize"""
         if not self._capacity_reached:
             batch = random.sample(self._buffer[: self._data_index], self._batchsize)

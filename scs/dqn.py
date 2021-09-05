@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 
-def make_dqn(actions, input_dimensions):
+def make_dqn(actions, input_dimensions) -> tf.keras.Sequential:
     model = tf.keras.Sequential()
 
     model.add(
