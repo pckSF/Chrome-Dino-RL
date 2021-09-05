@@ -265,6 +265,6 @@ class DinoAgent:
         ax_loss.set_xlabel("Episode")
         plt.show()
 
-    def _print_terminal(self, message: str) -> str:
+    def _print_terminal(self, message: str) -> None:
         """Prints a timestamped message to the terminal"""
         print(f"{datetime.now()}: {message}")
